@@ -5,7 +5,7 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 SKILL_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 BIN_DIR="$SKILL_DIR/bin"
-REPO="${INFLUX_QUERY_REPO:-zhangxiao/influx-query}"
+REPO="${INFLUX_QUERY_REPO:-snowfoxzx/influx-query}"
 VERSION="${INFLUX_QUERY_VERSION:-latest}"
 SHA256SUMS_FILE_OVERRIDE="${INFLUX_QUERY_SHA256SUMS_FILE:-}"
 
