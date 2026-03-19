@@ -12,6 +12,7 @@ This repository is designed to publish release binaries for:
 
 GitHub Actions builds tagged releases and uploads archives to GitHub Releases.
 The bundled skill installs the correct binary for the current platform from the latest release by default.
+Each release also publishes a `SHA256SUMS` file, and the install script verifies the downloaded archive before extraction.
 
 ## Build
 
@@ -42,6 +43,7 @@ The workflow in [.github/workflows/release.yml](/Users/zhangxiao/Developer/rust/
 - `influx-query-macos-aarch64.tar.gz`
 - `influx-query-windows-x86_64.zip`
 - `influx-query-windows-aarch64.zip`
+- `SHA256SUMS`
 
 ## Skill Distribution
 

@@ -58,6 +58,42 @@ test_windows_arm64_asset_name() {
     "windows arm64 asset name"
 }
 
+test_checksum_url_for_tagged_release() {
+  actual=$(
+    INFLUX_QUERY_REPO=acme/influx-query \
+    INFLUX_QUERY_VERSION=v1.2.3 \
+    INFLUX_QUERY_OS=Linux \
+    INFLUX_QUERY_ARCH=x86_64 \
+    sh "$SCRIPT" print-checksum-url
+  )
+
+  assert_eq \
+    "https://github.com/acme/influx-query/releases/download/v1.2.3/SHA256SUMS" \
+    "$actual" \
+    "checksum URL for tagged release"
+}
+
+test_extract_expected_checksum() {
+  sums_file=$(mktemp)
+  trap 'rm -f "$sums_file"' EXIT INT TERM
+  cat >"$sums_file" <<'EOF'
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  influx-query-linux-x86_64.tar.gz
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb  influx-query-macos-aarch64.tar.gz
+EOF
+
+  actual=$(
+    INFLUX_QUERY_OS=Darwin \
+    INFLUX_QUERY_ARCH=arm64 \
+    INFLUX_QUERY_SHA256SUMS_FILE="$sums_file" \
+    sh "$SCRIPT" print-expected-checksum
+  )
+
+  assert_eq \
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" \
+    "$actual" \
+    "extract matching checksum from SHA256SUMS"
+}
+
 test_unsupported_platform_fails() {
   if INFLUX_QUERY_OS=FreeBSD INFLUX_QUERY_ARCH=x86_64 sh "$SCRIPT" print-asset-name >/dev/null 2>&1; then
     printf 'assertion failed: unsupported platform should fail\n' >&2
@@ -68,6 +104,8 @@ test_unsupported_platform_fails() {
 test_latest_linux_x86_64
 test_tagged_macos_arm64
 test_windows_arm64_asset_name
+test_checksum_url_for_tagged_release
+test_extract_expected_checksum
 test_unsupported_platform_fails
 
 printf 'install-script tests passed\n'

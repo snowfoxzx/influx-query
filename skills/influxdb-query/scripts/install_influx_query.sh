@@ -7,6 +7,7 @@ SKILL_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 BIN_DIR="$SKILL_DIR/bin"
 REPO="${INFLUX_QUERY_REPO:-zhangxiao/influx-query}"
 VERSION="${INFLUX_QUERY_VERSION:-latest}"
+SHA256SUMS_FILE_OVERRIDE="${INFLUX_QUERY_SHA256SUMS_FILE:-}"
 
 detect_os() {
   if [ -n "${INFLUX_QUERY_OS:-}" ]; then
@@ -87,22 +88,41 @@ download_url() {
   fi
 }
 
+checksum_url() {
+  if [ "$VERSION" = "latest" ]; then
+    printf 'https://github.com/%s/releases/latest/download/SHA256SUMS\n' "$REPO"
+  else
+    printf 'https://github.com/%s/releases/download/%s/SHA256SUMS\n' "$REPO" "$VERSION"
+  fi
+}
+
 download_archive() {
   url=$(download_url)
   archive_path=$1
+  download_file "$url" "$archive_path"
+}
+
+download_file() {
+  url=$1
+  output_path=$2
 
   if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "$url" -o "$archive_path"
+    curl -fsSL "$url" -o "$output_path"
     return 0
   fi
 
   if command -v wget >/dev/null 2>&1; then
-    wget -qO "$archive_path" "$url"
+    wget -qO "$output_path" "$url"
     return 0
   fi
 
   printf 'curl or wget is required to download %s\n' "$url" >&2
   exit 1
+}
+
+download_checksums() {
+  sums_path=$1
+  download_file "$(checksum_url)" "$sums_path"
 }
 
 extract_archive() {
@@ -138,12 +158,70 @@ binary_name() {
   esac
 }
 
+checksum_file_path() {
+  if [ -n "$SHA256SUMS_FILE_OVERRIDE" ]; then
+    printf '%s\n' "$SHA256SUMS_FILE_OVERRIDE"
+  else
+    printf '%s\n' "$1"
+  fi
+}
+
+expected_checksum() {
+  sums_path=$(checksum_file_path "$1")
+  asset=$(asset_name)
+  checksum=$(awk -v asset="$asset" '$2 == asset { print $1; exit }' "$sums_path")
+
+  if [ -z "$checksum" ]; then
+    printf 'checksum for %s not found in %s\n' "$asset" "$sums_path" >&2
+    exit 1
+  fi
+
+  printf '%s\n' "$checksum"
+}
+
+actual_checksum() {
+  archive_path=$1
+
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$archive_path" | awk '{print $1}'
+    return 0
+  fi
+
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$archive_path" | awk '{print $1}'
+    return 0
+  fi
+
+  if command -v openssl >/dev/null 2>&1; then
+    openssl dgst -sha256 "$archive_path" | awk '{print $NF}'
+    return 0
+  fi
+
+  printf 'sha256sum, shasum, or openssl is required to verify downloads\n' >&2
+  exit 1
+}
+
+verify_archive_checksum() {
+  archive_path=$1
+  sums_path=$2
+  expected=$(expected_checksum "$sums_path")
+  actual=$(actual_checksum "$archive_path")
+
+  if [ "$expected" != "$actual" ]; then
+    printf 'checksum mismatch for %s\nexpected: %s\nactual:   %s\n' "$(asset_name)" "$expected" "$actual" >&2
+    exit 1
+  fi
+}
+
 install_binary() {
   temp_dir=$(mktemp -d)
   trap 'rm -rf "$temp_dir"' EXIT INT TERM
 
   archive_path="$temp_dir/$(asset_name)"
+  sums_path="$temp_dir/SHA256SUMS"
   download_archive "$archive_path"
+  download_checksums "$sums_path"
+  verify_archive_checksum "$archive_path" "$sums_path"
   extract_archive "$archive_path" "$temp_dir"
 
   mkdir -p "$BIN_DIR"
@@ -172,8 +250,14 @@ case "${1:-install}" in
   print-download-url)
     download_url
     ;;
+  print-checksum-url)
+    checksum_url
+    ;;
+  print-expected-checksum)
+    expected_checksum "${SHA256SUMS_FILE_OVERRIDE:-SHA256SUMS}"
+    ;;
   *)
-    printf 'usage: %s [install|print-asset-name|print-download-url]\n' "$0" >&2
+    printf 'usage: %s [install|print-asset-name|print-download-url|print-checksum-url|print-expected-checksum]\n' "$0" >&2
     exit 1
     ;;
 esac

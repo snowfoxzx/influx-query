@@ -22,6 +22,8 @@ Use this skill to run direct InfluxDB queries through the bundled `influx-query`
 sh skills/influxdb-query/scripts/install_influx_query.sh
 ```
 
+The install script downloads the platform-specific archive and verifies it against the release `SHA256SUMS` file before extracting.
+
 2. Run a query with the installed binary:
 
 ```bash
@@ -60,4 +62,3 @@ skills/influxdb-query/bin/influx-query \
 
 - Re-run the install script to fetch the latest GitHub Release binary.
 - Set `INFLUX_QUERY_VERSION=vX.Y.Z` before running the install script to pin a specific release.
-
