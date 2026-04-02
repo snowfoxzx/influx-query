@@ -2,6 +2,11 @@
 
 Single-binary CLI for querying InfluxDB v1 and v2.
 
+## Repository Conventions
+
+- Prefer English for repository documentation and Git commit messages.
+- Update `Cargo.toml` `package.version` before publishing a new release tag.
+
 ## Distribution
 
 This repository is designed to publish release binaries for:

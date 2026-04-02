@@ -2,6 +2,11 @@
 
 This file is for AI successors working in this repository.
 
+## Repository Conventions
+
+- Prefer English for repository documentation and Git commit messages unless a task explicitly requires another language.
+- Update `Cargo.toml` `package.version` before publishing a new release tag.
+
 ## Purpose
 
 This repository has three coupled deliverables:
