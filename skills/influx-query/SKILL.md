@@ -1,11 +1,15 @@
 ---
-name: influxdb-query
+name: influx-query
 description: Use when querying InfluxDB v1 or v2 directly, especially for ad hoc data inspection, validating InfluxQL or Flux queries, or debugging request and response details with a local CLI.
 ---
 
-# InfluxDB Query
+# Influx Query
 
-Use this skill to run direct InfluxDB queries through the bundled `influx-query` CLI.
+Use the Influx Query skill to run direct InfluxDB queries through the bundled `influx-query` CLI.
+
+The examples below assume `SKILL_DIR` is the directory that contains this `SKILL.md`.
+When the skill is installed into Codex or Claude Code, use that installed skill directory.
+When working from a checkout of this repository, set `SKILL_DIR` to the bundled skill directory in the repo.
 
 ## When To Use
 
@@ -19,7 +23,7 @@ Use this skill to run direct InfluxDB queries through the bundled `influx-query`
 1. Ensure the binary is installed:
 
 ```bash
-sh skills/influxdb-query/scripts/install_influx_query.sh
+sh "$SKILL_DIR/scripts/install_influx_query.sh"
 ```
 
 The install script downloads the platform-specific archive and verifies it against the release `SHA256SUMS` file before extracting.
@@ -27,7 +31,7 @@ The install script downloads the platform-specific archive and verifies it again
 2. Run a query with the installed binary:
 
 ```bash
-skills/influxdb-query/bin/influx-query --help
+"$SKILL_DIR/bin/influx-query" --help
 ```
 
 3. Use one of these templates.
@@ -35,7 +39,7 @@ skills/influxdb-query/bin/influx-query --help
 InfluxDB v1:
 
 ```bash
-skills/influxdb-query/bin/influx-query \
+"$SKILL_DIR/bin/influx-query" \
   --api v1 \
   --url http://HOST:8086 \
   --db DATABASE \
@@ -45,7 +49,7 @@ skills/influxdb-query/bin/influx-query \
 InfluxDB v2:
 
 ```bash
-skills/influxdb-query/bin/influx-query \
+"$SKILL_DIR/bin/influx-query" \
   --api v2 \
   --url https://HOST \
   --org ORG \

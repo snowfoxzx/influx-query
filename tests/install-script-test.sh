@@ -3,7 +3,7 @@
 set -eu
 
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-SCRIPT="$ROOT_DIR/skills/influxdb-query/scripts/install_influx_query.sh"
+SCRIPT="$ROOT_DIR/skills/influx-query/scripts/install_influx_query.sh"
 
 assert_eq() {
   expected=$1
@@ -101,11 +101,34 @@ test_unsupported_platform_fails() {
   fi
 }
 
+test_skill_markdown_is_portable() {
+  if rg -n 'skills/influx-query/' "$ROOT_DIR/skills/influx-query/SKILL.md" >/dev/null 2>&1; then
+    printf 'assertion failed: SKILL.md should not hardcode repository-relative skill paths\n' >&2
+    exit 1
+  fi
+}
+
+test_codex_plugin_manifest_exists() {
+  manifest="$ROOT_DIR/.codex-plugin/plugin.json"
+
+  if [ ! -f "$manifest" ]; then
+    printf 'assertion failed: codex plugin manifest should exist\n' >&2
+    exit 1
+  fi
+
+  if ! rg -n '"skills":\s*"\./skills/"' "$manifest" >/dev/null 2>&1; then
+    printf 'assertion failed: codex plugin manifest should expose ./skills/\n' >&2
+    exit 1
+  fi
+}
+
 test_latest_linux_x86_64
 test_tagged_macos_arm64
 test_windows_arm64_asset_name
 test_checksum_url_for_tagged_release
 test_extract_expected_checksum
 test_unsupported_platform_fails
+test_skill_markdown_is_portable
+test_codex_plugin_manifest_exists
 
 printf 'install-script tests passed\n'

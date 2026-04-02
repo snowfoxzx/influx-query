@@ -47,19 +47,22 @@ The workflow in [.github/workflows/release.yml](/Users/zhangxiao/Developer/rust/
 
 ## Skill Distribution
 
-The distributable skill lives in [skills/influxdb-query/SKILL.md](/Users/zhangxiao/Developer/rust/influx-query/skills/influxdb-query/SKILL.md).
+The distributable skill lives in [skills/influx-query/SKILL.md](/Users/zhangxiao/Developer/rust/influx-query/skills/influx-query/SKILL.md).
 
-After the repository is on GitHub, the skill can be installed from the repo, and its install script downloads the right binary for the local platform:
+The repo root also includes a minimal `.codex-plugin/plugin.json` manifest for Codex plugin packaging.
+Claude Code can use the same skill directory when it is copied or installed into `~/.claude/skills`.
+
+The skill instructions are written to be portable. Resolve `SKILL_DIR` to the directory that contains `SKILL.md`, then run:
 
 ```bash
-sh skills/influxdb-query/scripts/install_influx_query.sh
+sh "$SKILL_DIR/scripts/install_influx_query.sh"
 ```
 
 Override the release source when needed:
 
 ```bash
-INFLUX_QUERY_REPO=OWNER/REPO sh skills/influxdb-query/scripts/install_influx_query.sh
-INFLUX_QUERY_VERSION=v0.1.0 sh skills/influxdb-query/scripts/install_influx_query.sh
+INFLUX_QUERY_REPO=OWNER/REPO sh "$SKILL_DIR/scripts/install_influx_query.sh"
+INFLUX_QUERY_VERSION=v0.1.0 sh "$SKILL_DIR/scripts/install_influx_query.sh"
 ```
 
 ## Examples
@@ -67,7 +70,7 @@ INFLUX_QUERY_VERSION=v0.1.0 sh skills/influxdb-query/scripts/install_influx_quer
 InfluxDB v1 with basic auth:
 
 ```bash
-target/release/influx-query \
+influx-query \
   --api v1 \
   --url http://localhost:8086 \
   --db metrics \
@@ -80,7 +83,7 @@ target/release/influx-query \
 InfluxDB v2 with token auth:
 
 ```bash
-target/release/influx-query \
+influx-query \
   --api v2 \
   --url https://influx.example.com \
   --org acme \

@@ -1,0 +1,39 @@
+{
+  "name": "influx-query",
+  "version": "0.1.0",
+  "description": "Influx Query skill for querying InfluxDB v1 and v2 with a portable single-binary CLI.",
+  "author": {
+    "name": "snowfoxzx",
+    "url": "https://github.com/snowfoxzx"
+  },
+  "homepage": "https://github.com/snowfoxzx/influx-query",
+  "repository": "https://github.com/snowfoxzx/influx-query",
+  "license": "UNLICENSED",
+  "keywords": [
+    "influxdb",
+    "influxql",
+    "flux",
+    "cli",
+    "skill"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Influx Query",
+    "shortDescription": "Influx Query skill for InfluxDB v1 and v2",
+    "longDescription": "Install the correct release binary for the current platform, then use Influx Query to run ad hoc InfluxQL or Flux queries with a single portable CLI.",
+    "developerName": "snowfoxzx",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/snowfoxzx/influx-query",
+    "privacyPolicyURL": "https://github.com/snowfoxzx/influx-query",
+    "termsOfServiceURL": "https://github.com/snowfoxzx/influx-query",
+    "defaultPrompt": [
+      "Install Influx Query and run an InfluxDB query"
+    ],
+    "screenshots": [],
+    "brandColor": "#2563EB"
+  }
+}

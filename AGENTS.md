@@ -7,8 +7,10 @@ This file is for AI successors working in this repository.
 This repository has three coupled deliverables:
 
 1. A Rust CLI named `influx-query` for querying InfluxDB v1 and v2.
-2. A distributable skill in `skills/influxdb-query/` that installs and uses the CLI.
+2. A distributable skill in `skills/influx-query/` that installs and uses the CLI.
 3. A GitHub Actions release workflow that publishes platform-specific binaries and `SHA256SUMS`.
+
+For Codex compatibility, the repository ships a repo-root `.codex-plugin/plugin.json` that exposes the bundled skill for distribution.
 
 When changing one of these areas, check whether the other two also need updates.
 
@@ -17,8 +19,9 @@ When changing one of these areas, check whether the other two also need updates.
 - `src/main.rs`: CLI entrypoint.
 - `src/lib.rs`: argument parsing, request building, query execution, response formatting, debug output, and unit tests.
 - `tests/install-script-test.sh`: shell-level tests for the skill installer naming and checksum logic.
-- `skills/influxdb-query/SKILL.md`: distributable skill instructions.
-- `skills/influxdb-query/scripts/install_influx_query.sh`: platform detection, release download, checksum verification, extraction, and install flow.
+- `skills/influx-query/SKILL.md`: distributable skill instructions.
+- `skills/influx-query/scripts/install_influx_query.sh`: platform detection, release download, checksum verification, extraction, and install flow.
+- `.codex-plugin/plugin.json`: minimal Codex plugin manifest that exposes `./skills/`.
 - `.github/workflows/release.yml`: release pipeline for all supported targets plus `SHA256SUMS`.
 - `README.md`: human-facing project and release overview.
 
@@ -47,8 +50,8 @@ cargo test
 
 ### Change skill installer behavior
 
-1. Update `skills/influxdb-query/scripts/install_influx_query.sh`.
-2. Update `skills/influxdb-query/SKILL.md` if invocation or guarantees changed.
+1. Update `skills/influx-query/scripts/install_influx_query.sh`.
+2. Update `skills/influx-query/SKILL.md` if invocation or guarantees changed.
 3. Run:
 
 ```bash
@@ -63,10 +66,10 @@ sh tests/install-script-test.sh
    - `SHA256SUMS` still published
    - supported targets still align with install script platform mapping
 3. If release asset naming changes, update:
-   - `skills/influxdb-query/scripts/install_influx_query.sh`
+   - `skills/influx-query/scripts/install_influx_query.sh`
    - `tests/install-script-test.sh`
    - `README.md`
-   - `skills/influxdb-query/SKILL.md`
+   - `skills/influx-query/SKILL.md`
 
 ### Cut a release
 
